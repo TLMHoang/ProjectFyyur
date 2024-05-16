@@ -1,14 +1,23 @@
 from datetime import datetime
-from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
-from wtforms.validators import DataRequired, AnyOf, URL
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, ValidationError
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp
 
-class ShowForm(Form):
+import re
+
+def validate_phone(self, phone):
+    regex = r"""\d{3}-\d{3}-\d{4}"""
+    if not re.search(regex, phone):
+        raise ValidationError("Invalid phone number.")
+
+class ShowForm(FlaskForm):
     artist_id = StringField(
-        'artist_id'
+        'artist_id',
+        validators=[DataRequired()]
     )
     venue_id = StringField(
-        'venue_id'
+        'venue_id',
+        validators=[DataRequired()]
     )
     start_time = DateTimeField(
         'start_time',
@@ -16,7 +25,7 @@ class ShowForm(Form):
         default= datetime.today()
     )
 
-class VenueForm(Form):
+class VenueForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -83,7 +92,8 @@ class VenueForm(Form):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        'phone',
+        validators=[DataRequired(),Regexp(r'^\d{3}-\d{3}-\d{4}$', message="Error, phone number be in format xxx-xxx-xxxx")]
     )
     image_link = StringField(
         'image_link'
@@ -128,7 +138,7 @@ class VenueForm(Form):
 
 
 
-class ArtistForm(Form):
+class ArtistForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -193,7 +203,8 @@ class ArtistForm(Form):
     )
     phone = StringField(
         # TODO implement validation logic for state
-        'phone'
+        'phone',
+        validators=[DataRequired(),Regexp(r'^\d{3}-\d{3}-\d{4}$', message="Error, phone number be in format xxx-xxx-xxxx")]
     )
     image_link = StringField(
         'image_link'
